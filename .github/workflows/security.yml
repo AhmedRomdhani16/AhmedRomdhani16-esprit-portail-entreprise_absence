@@ -1,0 +1,43 @@
+name: Security Scans
+
+on:
+  push:
+    branches:
+      - '**'  # Triggers on push to any branch, adjust as needed
+  pull_request:
+    branches:
+      - '**'  # Triggers on pull request to any branch, adjust as needed
+
+jobs:
+  codeql:
+    name: CodeQL analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up CodeQL
+        uses: github/codeql-action/setup@v1
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v2
+
+  secret-scanning:
+    name: Secret scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run secret scanning
+        run: |
+          # Install TruffleHog (or GitGuardian for secrets scanning)
+          curl -sSL https://github.com/trufflesecurity/trufflehog/releases/download/v3.0.3/trufflehog_3.0.3_linux_amd64.tar.gz | tar -xz
+          sudo mv trufflehog /usr/local/bin/
+          
+          # Run TruffleHog for secret scanning
+          trufflehog --json . > trufflehog_report.json
+
+          # Show the results of the secret scanning
+          cat trufflehog_report.json
+          
