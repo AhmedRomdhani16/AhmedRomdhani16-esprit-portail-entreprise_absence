@@ -27,28 +27,28 @@ jobs:
     name: Secret scanning
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code 
-        uses: actions/checkout@v2  
+      - name: Checkout code (main repository)
+        uses: actions/checkout@v2  # Checkout the main repository
 
       - name: Install TruffleHog
         run: |
-          # Download TruffleHog release
+          # Download and install TruffleHog
           curl -sSL https://github.com/trufflesecurity/trufflehog/releases/download/v3.0.3/trufflehog_3.0.3_linux_amd64.tar.gz | tar -xz
           sudo mv trufflehog /usr/local/bin/
 
       - name: Run TruffleHog for secret scanning
         run: |
-          # Ensure you are in the main repository directory
-          cd $GITHUB_WORKSPACE  # Ensure we are back in the main repo
+          # Ensure we are in the main repository directory
+          cd $GITHUB_WORKSPACE  # Change to the main repo's directory
 
-          # Run TruffleHog on the main repo (local directory)
-          trufflehog --json . > trufflehog_report.json
+          # Run TruffleHog to scan for secrets in the main repository
+          trufflehog --json $GITHUB_WORKSPACE > trufflehog_report.json
           
           # Show the results of the secret scanning
           cat trufflehog_report.json
 
       - name: Upload TruffleHog results as an artifact
-        uses: actions/upload-artifact@v3  # Updated to v3
+        uses: actions/upload-artifact@v3
         with:
           name: trufflehog-report
           path: trufflehog_report.json
