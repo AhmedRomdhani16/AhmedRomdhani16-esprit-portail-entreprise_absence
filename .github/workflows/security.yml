@@ -1,4 +1,3 @@
-
 name: Security Scans
 on:
   push:
@@ -19,17 +18,42 @@ jobs:
       actions: read
       contents: read
     
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['java']  # Changed to just Java since that's what was detected
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
-          languages: javascript, python, java  # Add languages you want to analyze
+          languages: ${{ matrix.language }}
+          
+      - name: Build Java
+        run: |
+          # Add your Java build commands here
+          # For Maven:
+          if [ -f "./pom.xml" ]; then
+            mvn clean install -DskipTests
+          # For Gradle:
+          elif [ -f "./build.gradle" ] || [ -f "./build.gradle.kts" ]; then
+            chmod +x ./gradlew
+            ./gradlew build -x test
+          fi
         
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:${{ matrix.language }}"
 
   secret-scanning:
     name: Secret scanning
@@ -39,7 +63,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Fetch all history for all branches and tags
+          fetch-depth: 0
         
       - name: Run secret scanning with TruffleHog
         run: |
@@ -90,3 +114,5 @@ jobs:
             echo "::error::Security scan failed! Please check the logs for details."
             exit 1
           fi
+
+
