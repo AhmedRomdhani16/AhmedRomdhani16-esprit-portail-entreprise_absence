@@ -18,17 +18,24 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up CodeQL
-        uses: github/codeql-action/setup@v2  # Correct version of setup action
+        uses: github/codeql-action/setup@v2
 
       - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@v2  # Correct version for analyze action
+        uses: github/codeql-action/analyze@v2
 
   secret-scanning:
     name: Secret scanning
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout code (main repository)
+        uses: actions/checkout@v2  # Checkout main repo first
+
+      # (Optional) Checkout a secondary repo if needed for other tasks
+      - name: Checkout secondary repo
         uses: actions/checkout@v2
+        with:
+          repository: 'another/repository'
+          path: 'secondary-repo'  # Example: Check out secondary repo to a specific path
 
       - name: Install TruffleHog
         run: |
@@ -38,7 +45,10 @@ jobs:
 
       - name: Run TruffleHog for secret scanning
         run: |
-          # Run TruffleHog on the repository (local directory)
+          # Ensure you are in the main repository directory
+          cd $GITHUB_WORKSPACE  # Ensure we are back in the main repo
+
+          # Run TruffleHog on the main repo (local directory)
           trufflehog --json . > trufflehog_report.json
           
           # Show the results of the secret scanning
@@ -49,5 +59,4 @@ jobs:
         with:
           name: trufflehog-report
           path: trufflehog_report.json
-
 
