@@ -27,15 +27,8 @@ jobs:
     name: Secret scanning
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code (main repository)
-        uses: actions/checkout@v2  # Checkout main repo first
-
-      # (Optional) Checkout a secondary repo if needed for other tasks
-      - name: Checkout secondary repo
-        uses: actions/checkout@v2
-        with:
-          repository: 'another/repository'
-          path: 'secondary-repo'  # Example: Check out secondary repo to a specific path
+      - name: Checkout code 
+        uses: actions/checkout@v2  
 
       - name: Install TruffleHog
         run: |
