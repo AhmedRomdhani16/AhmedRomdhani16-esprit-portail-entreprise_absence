@@ -1,3 +1,4 @@
+
 name: Security Scans
 
 on:
@@ -17,10 +18,10 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up CodeQL
-        uses: github/codeql-action/setup@v2   # Updated version
+        uses: github/codeql-action/setup@v2  # Correct version of setup action
 
       - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@v2  # Updated version
+        uses: github/codeql-action/analyze@v2  # Correct version for analyze action
 
   secret-scanning:
     name: Secret scanning
@@ -37,8 +38,8 @@ jobs:
 
       - name: Run TruffleHog for secret scanning
         run: |
-          # Run TruffleHog on the repository (local directory), and output the result as a JSON file
-          trufflehog --json --repo . > trufflehog_report.json
+          # Run TruffleHog on the repository (local directory)
+          trufflehog --json . > trufflehog_report.json
           
           # Show the results of the secret scanning
           cat trufflehog_report.json
@@ -48,6 +49,5 @@ jobs:
         with:
           name: trufflehog-report
           path: trufflehog_report.json
-
 
 
