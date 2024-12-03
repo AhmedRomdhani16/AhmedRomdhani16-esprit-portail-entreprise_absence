@@ -3,10 +3,10 @@ name: Security Scans
 on:
   push:
     branches:
-      - 'security-setup'  # Triggers only on push to the secure-branch, adjust as needed
+      - 'security-setup'  # Trigger on secure-branch push, adjust as needed
   pull_request:
     branches:
-      - 'security-setup'  # Triggers on pull request to secure-branch
+      - 'security-setup'  # Trigger on pull request to secure-branch
 
 jobs:
   codeql:
@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up CodeQL
-        uses: github/codeql-action/setup@v1
+        uses: github/codeql-action/setup@v2  # Updated to v2
 
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@v2
@@ -29,25 +29,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Run secret scanning
+      - name: Run secret scanning with TruffleHog
         run: |
           # Install TruffleHog (or GitGuardian for secrets scanning)
           curl -sSL https://github.com/trufflesecurity/trufflehog/releases/download/v3.0.3/trufflehog_3.0.3_linux_amd64.tar.gz | tar -xz
           sudo mv trufflehog /usr/local/bin/
-          
-          # Run TruffleHog for secret scanning
-          trufflehog --json . > trufflehog_report.json
+
+          # Run TruffleHog for secret scanning, using the workspace as the target directory
+          trufflehog --json $GITHUB_WORKSPACE > trufflehog_report.json
 
           # Show the results of the secret scanning
           cat trufflehog_report.json
 
-      # Re-checkout the secure-branch to make sure it's in context of the right branch
+      # Re-checkout the secure-branch (optional, depending on your use case)
       - name: Re-checkout secure-branch
         uses: actions/checkout@v2
         with:
-          ref: secure-branch  # Make sure we are back on the secure-branch
+          ref: secure-branch
 
-      # Post-run actions (e.g., uploading TruffleHog report)
+      # Upload TruffleHog report (optional, depending on your use case)
       - name: Upload TruffleHog report
         uses: actions/upload-artifact@v3
         with:
