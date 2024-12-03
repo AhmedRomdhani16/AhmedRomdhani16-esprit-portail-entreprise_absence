@@ -1,3 +1,4 @@
+          
 name: Security Scans
 
 on:
@@ -29,15 +30,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Run secret scanning
+      - name: Install TruffleHog
         run: |
-          # Install TruffleHog (or GitGuardian for secrets scanning)
+          # Download TruffleHog release
           curl -sSL https://github.com/trufflesecurity/trufflehog/releases/download/v3.0.3/trufflehog_3.0.3_linux_amd64.tar.gz | tar -xz
           sudo mv trufflehog /usr/local/bin/
-          
-          # Run TruffleHog for secret scanning
-          trufflehog --json . > trufflehog_report.json
 
+      - name: Run TruffleHog for secret scanning
+        run: |
+          # Run TruffleHog on the repository (local directory), and output the result as a JSON file
+          trufflehog --json --repo . > trufflehog_report.json
+          
           # Show the results of the secret scanning
           cat trufflehog_report.json
-          
+
+      - name: Upload TruffleHog results as an artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: trufflehog-report
+          path: trufflehog_report.json
+
