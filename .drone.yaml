@@ -1,34 +1,19 @@
 kind: pipeline
-type: docker
+type: kubernetes
 name: build and push image to harbor
-trigger:
-  event:
-    - push
-    - pull_request
-    - tag
-
-
-
-volumes:
-  - name: dockersock
-    host:
-      path: /var/run/docker.sock
 
 steps:
-  - name: build and publish
+  - name: build-and-push
     image: plugins/docker
-    environment:
-      DOCKER_BUILDKIT: 1  # Enable BuildKit for advanced Docker build features
-    volumes:
-      - name: dockersock
-        path: /var/run/docker.sock
     settings:
       username:
-        from_secret: harbor_username 
+        from_secret: harbor_username
       password:
-        from_secret: harbor_password 
-      dockerfile: Dockerfile  # Path to your Dockerfile
-      experimental: true  # Enable Docker experimental features (optional)
-      repo:  harbor.pixelslabs.com/testproject/absence  # Your Harbor repository
-      registry: harbor.pixelslabs.com  # Harbor registry address
-      
+        from_secret: harbor_password
+      dockerfile: Dockerfile
+      repo: harbor.pixelslabs.com/testproject/absence
+      registry: harbor.pixelslabs.com
+      tags:
+        - ${DRONE_COMMIT_SHA}
+        - latest
+
