@@ -5,6 +5,8 @@ name: build and push image to harbor
 steps:
   - name: build-and-push
     image: plugins/docker
+    environment:
+      DOCKER_BUILDKIT: 1
     settings:
       username:
         from_secret: harbor_username
