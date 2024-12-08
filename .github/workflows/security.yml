@@ -1,0 +1,118 @@
+name: Security Scans
+on:
+  push:
+    branches:
+      - '*'  # Run on all branches
+  pull_request:
+    branches:
+      - '*'  # Run on pull requests to all branches
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sunday at midnight
+
+jobs:
+  codeql:
+    name: CodeQL analysis
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['java']  # Changed to just Java since that's what was detected
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+          
+      - name: Build Java
+        run: |
+          # Add your Java build commands here
+          # For Maven:
+          if [ -f "./pom.xml" ]; then
+            mvn clean install -DskipTests
+          # For Gradle:
+          elif [ -f "./build.gradle" ] || [ -f "./build.gradle.kts" ]; then
+            chmod +x ./gradlew
+            ./gradlew build -x test
+          fi
+        
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:${{ matrix.language }}"
+
+  secret-scanning:
+    name: Secret scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+        
+      - name: Run secret scanning with TruffleHog
+        run: |
+          # Install TruffleHog
+          curl -sSL https://github.com/trufflesecurity/trufflehog/releases/download/v3.0.3/trufflehog_3.0.3_linux_amd64.tar.gz | tar -xz
+          sudo mv trufflehog /usr/local/bin/
+          
+          # Run TruffleHog with correct syntax
+          trufflehog git file://$GITHUB_WORKSPACE --json --branch ${GITHUB_REF#refs/heads/} > trufflehog_report.json || true
+          
+          # Show the results of the secret scanning
+          if [ -f trufflehog_report.json ]; then
+            cat trufflehog_report.json
+            if grep -q "finding" trufflehog_report.json; then
+              echo "::warning ::Potential secrets found in the codebase!"
+            fi
+          else
+            echo "No secrets found or scan failed"
+          fi
+
+      - name: Upload TruffleHog report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: trufflehog-report-${{ github.sha }}
+          path: trufflehog_report.json
+          retention-days: 7
+
+      - name: Check for exposed secrets
+        if: always()
+        run: |
+          if [ -f trufflehog_report.json ] && grep -q "finding" trufflehog_report.json; then
+            echo "Potential secrets were found in the codebase. Please review the TruffleHog report."
+            exit 1
+          fi
+
+  notify:
+    name: Notification
+    needs: [codeql, secret-scanning]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Check workflow status
+        if: always()
+        run: |
+          if [ "${{ needs.codeql.result }}" == "failure" ] || [ "${{ needs.secret-scanning.result }}" == "failure" ]; then
+            echo "::error::Security scan failed! Please check the logs for details."
+            exit 1
+          fi
+
+
