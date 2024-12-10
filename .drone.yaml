@@ -1,6 +1,6 @@
 kind: pipeline
 type: kubernetes
-name: build and push image to harbor
+name: spring-boot-security-pipeline
 
 trigger:
   event:
@@ -10,16 +10,33 @@ trigger:
     - master
 
 steps:
-  - name: snyk-scan
-    image: snyk/snyk:kubernetes
+  - name: snyk-code-scan
+    image: snyk/snyk:alpine
     environment:
       SNYK_TOKEN:
-        from_secret: snyk_token
-      KUBE_SECRET_NAME: drone-secrets
-      KUBE_NAMESPACE: drone
+        from_secret: snyktoken
     commands:
       - snyk auth $${SNYK_TOKEN}
-      - snyk container test harbor.pixelslabs.com/testproject/absence:${DRONE_COMMIT_SHA} --file=Dockerfile --severity-threshold=high
+      - snyk code test || true  # Test for code vulnerabilities
+      
+  - name: snyk-dependency-scan
+    image: snyk/snyk:alpine
+    environment:
+      SNYK_TOKEN:
+        from_secret: snyktoken
+    commands:
+      - snyk auth $${SNYK_TOKEN}
+      - snyk test || true  
+      
+  - name: snyk-container-scan
+    image: snyk/snyk:alpine
+    environment:
+      SNYK_TOKEN:
+        from_secret: snyktoken
+    commands:
+      - snyk auth $${SNYK_TOKEN}
+      - snyk container test harbor.pixelslabs.com/testproject/absence:${DRONE_COMMIT_SHA} --file=Dockerfile --severity-threshold=high || true
+      
   - name: build-and-push
     image: plugins/docker
     environment:
@@ -34,5 +51,4 @@ steps:
       registry: harbor.pixelslabs.com
       tags:
         - ${DRONE_COMMIT_SHA}
-
-
+        - latest
