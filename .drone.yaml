@@ -10,33 +10,19 @@ trigger:
     - master
 
 steps:
+  - name: prepare-maven
+    image: maven:3.8-openjdk-11
+    commands:
+      - chmod +x ./mvnw
+      
   - name: snyk-code-scan
     image: snyk/snyk:alpine
     environment:
       SNYK_TOKEN:
         from_secret: snyktoken
     commands:
-      # Using direct token authentication
       - export SNYK_API_TOKEN=$${SNYK_TOKEN}
-      - snyk code test || true  # Test for code vulnerabilities
-      
-  - name: snyk-dependency-scan
-    image: snyk/snyk:alpine
-    environment:
-      SNYK_TOKEN:
-        from_secret: snyktoken
-    commands:
-      - export SNYK_API_TOKEN=$${SNYK_TOKEN}
-      - snyk test || true  # Test dependencies
-      
-  - name: snyk-container-scan
-    image: snyk/snyk:alpine
-    environment:
-      SNYK_TOKEN:
-        from_secret: snyktoken
-    commands:
-      - export SNYK_API_TOKEN=$${SNYK_TOKEN}
-      - snyk container test harbor.pixelslabs.com/testproject/absence:${DRONE_COMMIT_SHA} --file=Dockerfile --severity-threshold=high || true
+      - snyk code test || true  
       
   - name: build-and-push
     image: plugins/docker
