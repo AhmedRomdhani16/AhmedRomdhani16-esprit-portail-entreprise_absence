@@ -8,8 +8,6 @@ trigger:
     - pull_request
   branch:
     - master
-    - security-setup
-
 steps:
   - name: build-and-push
     image: plugins/docker
@@ -25,3 +23,4 @@ steps:
       registry: harbor.pixelslabs.com
       tags:
         - ${DRONE_COMMIT_SHA}
+        - latest
