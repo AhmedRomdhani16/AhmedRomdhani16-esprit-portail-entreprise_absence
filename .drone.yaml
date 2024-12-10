@@ -13,7 +13,8 @@ steps:
   - name: build-and-test
     image: maven:3.8.4-openjdk-17
     commands:
-      - mvn clean install -Dmaven.test.failure.ignore=false jacoco:prepare-agent test jacoco:report
+      - mvn clean verify
+      - mvn jacoco:prepare-agent test jacoco:report
     volumes:
       - name: maven-cache
         path: /root/.m2
@@ -26,15 +27,17 @@ steps:
         from_secret: sonar_token
     commands:
       - mvn sonar:sonar 
-        -Dsonar.projectKey=absence 
-        -Dsonar.host.url=$${SONAR_HOST_URL} 
-        -Dsonar.login=$${SONAR_TOKEN} 
-        -Dsonar.java.binaries=target/classes 
-        -Dsonar.sources=src/main 
-        -Dsonar.tests=src/test 
+        -Dsonar.projectKey=absence-ms
+        -Dsonar.projectName=absence-ms
+        -Dsonar.host.url=$${SONAR_HOST_URL}
+        -Dsonar.login=$${SONAR_TOKEN}
+        -Dsonar.java.binaries=target/classes
+        -Dsonar.sources=src/main/java
+        -Dsonar.tests=src/test/java
         -Dsonar.java.source=17
         -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-        -Dsonar.exclusions=**/generated-sources/**,**/model/**,**/entity/**
+        -Dsonar.exclusions=**/generated-sources/**,**/model/**,**/entity/**,**/dto/**
+        -Dsonar.java.libraries=target/dependency/*.jar
     volumes:
       - name: maven-cache
         path: /root/.m2
