@@ -8,6 +8,7 @@ trigger:
     - pull_request
   branch:
     - master
+    - security-setup
 
 steps:
   - name: build-and-push
