@@ -10,6 +10,16 @@ trigger:
     - master
 
 steps:
+  - name: snyk-scan
+    image: snyk/snyk:kubernetes
+    environment:
+      SNYK_TOKEN:
+        from_secret: snyk_token
+      KUBE_SECRET_NAME: drone-secrets
+      KUBE_NAMESPACE: drone
+    commands:
+      - snyk auth $${SNYK_TOKEN}
+      - snyk container test harbor.pixelslabs.com/testproject/absence:${DRONE_COMMIT_SHA} --file=Dockerfile --severity-threshold=high
   - name: build-and-push
     image: plugins/docker
     environment:
