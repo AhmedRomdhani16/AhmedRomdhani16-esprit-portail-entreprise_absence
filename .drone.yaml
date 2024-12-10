@@ -16,7 +16,8 @@ steps:
       SNYK_TOKEN:
         from_secret: snyktoken
     commands:
-      - snyk auth $${SNYK_TOKEN}
+      # Using direct token authentication
+      - export SNYK_API_TOKEN=$${SNYK_TOKEN}
       - snyk code test || true  # Test for code vulnerabilities
       
   - name: snyk-dependency-scan
@@ -25,8 +26,8 @@ steps:
       SNYK_TOKEN:
         from_secret: snyktoken
     commands:
-      - snyk auth $${SNYK_TOKEN}
-      - snyk test || true  
+      - export SNYK_API_TOKEN=$${SNYK_TOKEN}
+      - snyk test || true  # Test dependencies
       
   - name: snyk-container-scan
     image: snyk/snyk:alpine
@@ -34,7 +35,7 @@ steps:
       SNYK_TOKEN:
         from_secret: snyktoken
     commands:
-      - snyk auth $${SNYK_TOKEN}
+      - export SNYK_API_TOKEN=$${SNYK_TOKEN}
       - snyk container test harbor.pixelslabs.com/testproject/absence:${DRONE_COMMIT_SHA} --file=Dockerfile --severity-threshold=high || true
       
   - name: build-and-push
