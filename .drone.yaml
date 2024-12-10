@@ -9,7 +9,30 @@ trigger:
   branch:
     - master
 steps:
-  
+  - name: build-and-test
+    image: maven:3.8.4-openjdk-17
+    commands:
+      - mvn clean install -DskipTests # First build without tests
+      - mvn test # Run tests separately to get better error visibility
+
+  - name: sonarqube-analysis
+    image: maven:3.8.4-openjdk-17
+    environment:
+      SONAR_HOST_URL: http://192.168.3.100:30008
+      SONAR_TOKEN:
+        from_secret: sonar_token
+    commands:
+      - mvn sonar:sonar
+        -Dsonar.projectKey=absence
+        -Dsonar.host.url=$${SONAR_HOST_URL}
+        -Dsonar.login=$${SONAR_TOKEN}
+        -Dsonar.java.binaries=target/classes
+        -Dsonar.sources=src/main
+        -Dsonar.tests=src/test
+        -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+    when:
+      status:
+        - success
 
   - name: build-and-push
     image: plugins/docker
