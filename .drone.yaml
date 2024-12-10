@@ -1,6 +1,5 @@
-kind: pipeline
 type: kubernetes
-name: spring-boot-security-pipeline
+name: build and push image to harbor
 
 trigger:
   event:
@@ -10,20 +9,6 @@ trigger:
     - master
 
 steps:
-  - name: prepare-maven
-    image: maven:3.8-openjdk-11
-    commands:
-      - chmod +x ./mvnw
-      
-  - name: snyk-code-scan
-    image: snyk/snyk:alpine
-    environment:
-      SNYK_TOKEN:
-        from_secret: snyktoken
-    commands:
-      - export SNYK_API_TOKEN=$${SNYK_TOKEN}
-      - snyk code test || true  
-      
   - name: build-and-push
     image: plugins/docker
     environment:
@@ -38,4 +23,3 @@ steps:
       registry: harbor.pixelslabs.com
       tags:
         - ${DRONE_COMMIT_SHA}
-        - latest
