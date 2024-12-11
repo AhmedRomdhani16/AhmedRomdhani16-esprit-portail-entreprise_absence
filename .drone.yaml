@@ -1,12 +1,6 @@
 kind: pipeline
 type: kubernetes
 name: build and push image to harbor
-trigger:
-  event:
-    - push
-    - pull_request
-  branch:
-    - master
 
 steps:
   - name: maven-build
