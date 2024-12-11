@@ -2,6 +2,7 @@ kind: pipeline
 type: kubernetes
 name: build and push image to harbor
 
+
 steps:
   - name: maven-build
     image: maven:3.8-openjdk-17
@@ -15,8 +16,10 @@ steps:
       SONAR_TOKEN:
         from_secret: sonar_token
     commands:
-      - sonar-scanner \
+      - sonar-scanner -X \
         -Dsonar.projectKey=absence \
+        -Dsonar.projectName=absence \
+        -Dsonar.projectVersion=1.0 \
         -Dsonar.sources=src/main/java \
         -Dsonar.host.url=$${SONAR_HOST_URL} \
         -Dsonar.login=$${SONAR_TOKEN} \
