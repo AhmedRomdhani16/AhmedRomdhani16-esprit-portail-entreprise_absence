@@ -23,7 +23,6 @@ steps:
     commands:
       - sonar-scanner \
         -Dsonar.projectKey=absence \
-        -Dsonar.projectName=absence \
         -Dsonar.projectVersion=1.0 \
         -Dsonar.sources=src/main/java \
         -Dsonar.host.url=$${SONAR_HOST_URL} \
