@@ -16,7 +16,7 @@ steps:
       SONAR_TOKEN:
         from_secret: sonar_token
     commands:
-      - sonar-scanner -X -Dsonar.projectKey=absence -Dsonar.projectName=absence -Dsonar.projectVersion=1.0 -Dsonar.sources=src/main/java -Dsonar.host.url=http://192.168.3.100:30008 -Dsonar.login=sqa_1c7f1312c55343bc20292725c84c5ba6fe81663e -Dsonar.java.binaries=target/classes -Dsonar.java.source=17 -Dsonar.sourceEncoding=UTF-8 -Dsonar.exclusions="**/target/**,**/Dockerfile" -Dsonar.java.libraries=target/dependency/*.jar
+      - sonar-scanner -X -Dsonar.projectKey=absence -Dsonar.projectName=absence -Dsonar.projectVersion=1.0 -Dsonar.sources=src/main/java -Dsonar.host.url=http://192.168.3.100:30008 -Dsonar.login=sqa_1c7f1312c55343bc20292725c84c5ba6fe81663e -Dsonar.java.binaries=target/classes -Dsonar.java.source=17 -Dsonar.sourceEncoding=UTF-8 -Dsonar.exclusions="**/target/**,**/Dockerfile" 
   - name: build-and-push
     image: plugins/docker
     environment:
