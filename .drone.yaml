@@ -10,7 +10,7 @@ trigger:
 
 steps:
   - name: maven-build
-    image: maven:3.8-openjdk-11
+    image: maven:3.8-openjdk-17
     commands:
       - mvn clean package -DskipTests
 
