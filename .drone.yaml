@@ -16,18 +16,20 @@ steps:
       SONAR_TOKEN:
         from_secret: sonar_token
     commands:
-      - sonar-scanner -X \
-        -Dsonar.projectKey=absence \
-        -Dsonar.projectName=absence \
-        -Dsonar.projectVersion=1.0 \
-        -Dsonar.sources=src/main/java \
-        -Dsonar.host.url=$${SONAR_HOST_URL} \
-        -Dsonar.login=$${SONAR_TOKEN} \
-        -Dsonar.java.binaries=target/classes \
-        -Dsonar.java.source=11 \
-        -Dsonar.sourceEncoding=UTF-8 \
-        -Dsonar.exclusions=**/target/**,**/Dockerfile \
-        -Dsonar.java.libraries=target/dependency/*.jar
+      |
+        sonar-scanner -X \
+          -Dsonar.projectKey=absence \
+          -Dsonar.projectName=absence \
+          -Dsonar.projectVersion=1.0 \
+          -Dsonar.sources=src/main/java \
+          -Dsonar.host.url=$SONAR_HOST_URL \
+          -Dsonar.login=$SONAR_TOKEN \
+          -Dsonar.java.binaries=target/classes \
+          -Dsonar.java.source=17 \
+          -Dsonar.sourceEncoding=UTF-8 \
+          -Dsonar.exclusions="**/target/**,**/Dockerfile" \
+          -Dsonar.java.libraries=target/dependency/*.jar
+          
   - name: build-and-push
     image: plugins/docker
     environment:
