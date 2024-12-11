@@ -2,30 +2,28 @@ kind: pipeline
 type: kubernetes
 name: build and push image to harbor
 
+
 steps:
   - name: maven-build
     image: maven:3.8-openjdk-17
     commands:
       - mvn clean package -DskipTests
 
+  
   - name: sonar-analysis
-    image: sonarsource/sonar-scanner-cli:4.8
-    environment:
-      SONAR_HOST_URL: "http://sonarservcie.sonarqube.svc.cluster.local:9000"
-      SONAR_TOKEN:
+    image: plugins/sonar
+    settings:
+      sonar_url: "http://sonarservcie.sonarqube.svc.cluster.local:9000"
+      sonar_login: 
         from_secret: sonar_token
-    commands:
-      - sonar-scanner \
-        -Dsonar.projectKey=absence \
-        -Dsonar.projectVersion=1.0 \
-        -Dsonar.sources=src/main/java \
-        -Dsonar.host.url=$${SONAR_HOST_URL} \
-        -Dsonar.login=$${SONAR_TOKEN} \
-        -Dsonar.java.binaries=target/classes \
-        -Dsonar.java.source=11 \
-        -Dsonar.sourceEncoding=UTF-8 \
-        -Dsonar.exclusions=**/target/**,**/Dockerfile \
-        -Dsonar.java.libraries=target/dependency/*.jar
+      sonar_project_key: "absence"
+      sonar_project_name: "absence"
+      sonar_sources: "src/main/java"
+      sonar_exclusions: "**/target/**,**/Dockerfile"
+      sonar_java_binaries: "target/classes"
+      sonar_java_libraries: "target/dependency/*.jar"
+      sonar_java_source: "17" 
+      
   - name: build-and-push
     image: plugins/docker
     environment:
