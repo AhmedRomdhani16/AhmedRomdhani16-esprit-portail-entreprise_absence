@@ -12,24 +12,11 @@ steps:
   - name: sonar-analysis
     image: sonarsource/sonar-scanner-cli:4.8
     environment:
-      SONAR_HOST_URL: "http://sonarservcie.sonarqube.svc.cluster.local:9000"
+      SONAR_HOST_URL: "http://192.168.3.100:30008"
       SONAR_TOKEN:
         from_secret: sonar_token
     commands:
-      |
-        sonar-scanner -X \
-          -Dsonar.projectKey=absence \
-          -Dsonar.projectName=absence \
-          -Dsonar.projectVersion=1.0 \
-          -Dsonar.sources=src/main/java \
-          -Dsonar.host.url=$SONAR_HOST_URL \
-          -Dsonar.login=$SONAR_TOKEN \
-          -Dsonar.java.binaries=target/classes \
-          -Dsonar.java.source=17 \
-          -Dsonar.sourceEncoding=UTF-8 \
-          -Dsonar.exclusions="**/target/**,**/Dockerfile" \
-          -Dsonar.java.libraries=target/dependency/*.jar
-          
+      - sonar-scanner -X -Dsonar.projectKey=absence -Dsonar.projectName=absence -Dsonar.projectVersion=1.0 -Dsonar.sources=src/main/java -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_TOKEN} -Dsonar.java.binaries=target/classes -Dsonar.java.source=17 -Dsonar.sourceEncoding=UTF-8 -Dsonar.exclusions="**/target/**,**/Dockerfile" -Dsonar.java.libraries=target/dependency/*.jar
   - name: build-and-push
     image: plugins/docker
     environment:
