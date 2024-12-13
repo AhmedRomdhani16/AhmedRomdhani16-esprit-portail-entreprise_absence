@@ -21,7 +21,7 @@ steps:
       - fs-scan-results.txt
       - dockerfile-scan-results.txt
   - name: install-mc
-    image: busybox
+    image: alpine:latest
     environment:
       MINIO_ACCESS_KEY: minioadmin  # Use your MinIO access key
       MINIO_SECRET_KEY: minioadmin123  # Use your MinIO secret key
@@ -31,7 +31,7 @@ steps:
       - mv /tmp/mc /usr/local/bin/mc
       - mc alias set myminio http://192.168.3.100:30900 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
   - name: upload-scan-results
-    image: busybox
+    image: alpine:latest
     environment:
       MINIO_ACCESS_KEY: minioadmin  # Use your MinIO access key
       MINIO_SECRET_KEY: minioadmin123  # Use your MinIO secret key
