@@ -16,7 +16,7 @@ steps:
         --output fs-scan-results.txt
       - trivy config --severity HIGH,CRITICAL .
         --format table
-      --output dockerfile-scan-results.txt
+        --output dockerfile-scan-results.txt
 
   - name: sonar-analysis
     image: sonarsource/sonar-scanner-cli:4.8
