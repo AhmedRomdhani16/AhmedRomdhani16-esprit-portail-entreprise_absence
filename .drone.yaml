@@ -20,6 +20,27 @@ steps:
     artifacts:
       - fs-scan-results.txt
       - dockerfile-scan-results.txt
+  - name: install-mc
+    image: busybox
+    commands:
+      - wget https://dl.min.io/client/mc/release/linux-amd64/mc
+      - chmod +x mc
+      - mv mc /usr/local/bin/
+  - name: configure-mc
+    image: busybox
+    environment:
+      MINIO_ACCESS_KEY: minioadmin  # Use your MinIO access key
+      MINIO_SECRET_KEY: minioadmin123  # Use your MinIO secret key
+    commands:
+      - mc alias set myminio http://192.168.3.100:30900 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
+  - name: upload-scan-results
+    image: busybox
+    environment:
+      MINIO_ACCESS_KEY: minioadmin  # Use your MinIO access key
+      MINIO_SECRET_KEY: minioadmin123  # Use your MinIO secret key
+    commands:
+      - mc cp fs-scan-results.txt myminio/scannerfiles/scan-results/fs-scan-results.txt
+      - mc cp dockerfile-scan-results.txt myminio/scannerfiles/scan-results/dockerfile-scan-results.txt
 
   - name: sonar-analysis
     image: sonarsource/sonar-scanner-cli:4.8
