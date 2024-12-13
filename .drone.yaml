@@ -22,16 +22,14 @@ steps:
       - dockerfile-scan-results.txt
   - name: install-mc
     image: busybox
-    commands:
-      - wget https://dl.min.io/client/mc/release/linux-amd64/mc -O /tmp/mc
-      - chmod +x /tmp/mc
-  - name: configure-mc
-    image: busybox
     environment:
       MINIO_ACCESS_KEY: minioadmin  # Use your MinIO access key
       MINIO_SECRET_KEY: minioadmin123  # Use your MinIO secret key
     commands:
-      - /tmp/mc alias set myminio http://192.168.3.100:30900 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
+      - wget https://dl.min.io/client/mc/release/linux-amd64/mc -O /tmp/mc
+      - chmod +x /tmp/mc
+      - mv /tmp/mc /usr/local/bin/mc
+      - mc alias set myminio http://192.168.3.100:30900 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
   - name: upload-scan-results
     image: busybox
     environment:
