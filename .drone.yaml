@@ -29,7 +29,7 @@ steps:
       - wget https://dl.min.io/client/mc/release/linux-amd64/mc -O /tmp/mc
       - chmod +x /tmp/mc
       - mv /tmp/mc /usr/local/bin/mc
-      - mc alias set myminio http://192.168.3.100:30901 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
+      - mc alias set myminio http://192.168.3.100:30922 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
       - mc mb myminio/scannerfiles || echo "Bucket already exists"
       - mc cp fs-scan-results.txt myminio/scannerfiles/scan-results/fs-scan-results.txt
       - mc cp dockerfile-scan-results.txt myminio/scannerfiles/scan-results/dockerfile-scan-results.txt
