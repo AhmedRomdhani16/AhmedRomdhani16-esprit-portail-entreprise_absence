@@ -14,9 +14,7 @@ steps:
       - trivy fs --severity HIGH,CRITICAL .
         --format table
         --output fs-scan-results.txt
-      - trivy config --severity HIGH,CRITICAL .
-        --format table
-        --output dockerfile-scan-results.txt
+      - trivy config --severity HIGH,CRITICAL . --format json --output dockerfile-scan-results.txt
     artifacts:
       - fs-scan-results.txt
       - dockerfile-scan-results.txt
