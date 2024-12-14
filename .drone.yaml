@@ -30,12 +30,7 @@ steps:
       - chmod +x /tmp/mc
       - mv /tmp/mc /usr/local/bin/mc
       - mc alias set myminio http://192.168.3.100:30900 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
-  - name: upload-scan-results
-    image: alpine:latest
-    environment:
-      MINIO_ACCESS_KEY: minioadmin  # Use your MinIO access key
-      MINIO_SECRET_KEY: minioadmin123  # Use your MinIO secret key
-    commands:
+      - mc mb myminio/scannerfiles || echo "Bucket already exists"
       - mc cp fs-scan-results.txt myminio/scannerfiles/scan-results/fs-scan-results.txt
       - mc cp dockerfile-scan-results.txt myminio/scannerfiles/scan-results/dockerfile-scan-results.txt
 
