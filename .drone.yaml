@@ -11,10 +11,10 @@ steps:
   - name: scan-file
     image: aquasec/trivy:latest
     commands:
-      - trivy fs --severity HIGH,CRITICAL .
+      - trivy fs --severity LOW,MEDIUM,HIGH,CRITICAL .
         --format table
         --output fs-scan-results.txt
-      - trivy config --severity HIGH,CRITICAL . --format json --output dockerfile-scan-results.txt
+      - trivy config --severity LOW,MEDIUM,HIGH,CRITICAL . --format json --output dockerfile-scan-results.txt
     artifacts:
       - fs-scan-results.txt
       - dockerfile-scan-results.txt
