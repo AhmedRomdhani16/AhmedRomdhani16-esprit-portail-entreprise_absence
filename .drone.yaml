@@ -4,6 +4,18 @@ name: build and push image to harbor
 
 
 steps:
+  - name: dependency-check
+    image: owasp/dependency-check:latest
+    failure: ignore  
+    commands:
+      - mkdir -p /report
+      - dependency-check.sh --scan . --format "ALL" --out /report
+        --suppression dependency-check-suppression.xml
+        --failOnCVSS 7
+      - cp /report/dependency-check-report.* .
+    artifacts:
+      - dependency-check-report.html
+      - dependency-check-report.json
   - name: maven-build
     image: maven:3.8-openjdk-17
     commands:
@@ -39,7 +51,7 @@ steps:
       SONAR_TOKEN:
         from_secret: sonar_token
     commands:
-      - sonar-scanner -X -Dsonar.projectKey=absence -Dsonar.projectName=absence -Dsonar.projectVersion=1.0 -Dsonar.sources=src/main/java -Dsonar.host.url=http://192.168.3.100:30008 -Dsonar.login=sqa_1c7f1312c55343bc20292725c84c5ba6fe81663e -Dsonar.java.binaries=target/classes -Dsonar.java.source=17 -Dsonar.sourceEncoding=UTF-8 -Dsonar.exclusions="**/target/**,**/Dockerfile" 
+      - sonar-scanner -X -Dsonar.projectKey=absence -Dsonar.projectName=absence -Dsonar.projectVersion=1.0 -Dsonar.sources=src/main/java -Dsonar.host.url=http://192.168.3.100:30008 -Dsonar.login=sqa_1c7f1312c55343bc20292725c84c5ba6fe81663e -Dsonar.java.binaries=target/classes -Dsonar.java.source=17 -Dsonar.sourceEncoding=UTF-8 -Dsonar.exclusions="**/target/**,**/Dockerfile" -Dsonar.dependencyCheck.htmlReportPath=dependency-check-report.html -Dsonar.dependencyCheck.jsonReportPath=dependency-check-report.json
   - name: build-and-push
     image: plugins/docker
     environment:
