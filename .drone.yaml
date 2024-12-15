@@ -9,7 +9,7 @@ steps:
     failure: ignore  
     commands:
       - mkdir -p /report
-      - dependency-check.sh --scan . --format "ALL" --out /report
+      - /usr/share/dependency-check/bin/dependency-check.sh --scan . --format "ALL" --out /report 
         --suppression dependency-check-suppression.xml
         --failOnCVSS 7
       - cp /report/dependency-check-report.* .
