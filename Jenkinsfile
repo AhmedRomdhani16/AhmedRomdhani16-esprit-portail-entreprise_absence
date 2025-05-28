@@ -22,6 +22,8 @@ pipeline{
              checkout scm
 
         }
+
+     }
         stage("Checkout code prod")
      {
         when{
