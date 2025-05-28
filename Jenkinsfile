@@ -17,7 +17,7 @@ pipeline{
 
 
     }
-    stage("Checkout code develop")
+    stage("build")
      {
         when{
         branch 'develop'
