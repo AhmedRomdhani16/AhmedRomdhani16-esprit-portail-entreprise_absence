@@ -13,7 +13,7 @@ pipeline{
 
 
     }
-     stage("Checkout code QA")
+    stage("Checkout code QA")
      {
         when{
         branch 'qaulite'
@@ -24,7 +24,7 @@ pipeline{
         }
 
      }
-        stage("Checkout code prod")
+    stage("Checkout code prod")
      {
         when{
         branch 'master'
