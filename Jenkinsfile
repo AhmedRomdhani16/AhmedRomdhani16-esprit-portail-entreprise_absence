@@ -1,5 +1,8 @@
 pipeline{
   agent any
+  tools{
+     maven 'maven'
+  }
   stages{
     stage("Checkout code develop")
      {
@@ -12,7 +15,22 @@ pipeline{
         }
 
 
+
     }
+    stage("Checkout code develop")
+     {
+        when{
+        branch 'develop'
+        }
+        steps{
+             sh 'mvn clean compile
+
+        }
+
+
+    }
+
+
     stage("Checkout code QA")
      {
         when{
